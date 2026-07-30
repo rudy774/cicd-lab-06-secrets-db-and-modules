@@ -116,6 +116,12 @@ x-ignition-healthcheck: &ignition-healthcheck
   retries: 10
   start_period: 90s
 
+secrets:
+  postgres_password:
+    file: ./secrets/postgres_password.txt
+  reporting_password:
+    file: ./secrets/reporting_password.txt
+
 services:
   # --- local gateway: edits on the host show up here immediately --------------
   gateway-local-development:
@@ -135,6 +141,9 @@ services:
       - "${LAB_GID:-0}"
     entrypoint: *ignition-entrypoint
     restart: unless-stopped
+    secrets:
+      - postgres_password
+      - reporting_password
     ports:
       - "8088:8088"
       - "8060:8060"
@@ -293,6 +302,9 @@ services:
     image: timescale/timescaledb:latest-pg16
     container_name: lab06-timescaledb
     restart: unless-stopped
+    secrets:
+      - postgres_password
+      - reporting_password
     ports:
       - "5432:5432"
     volumes:
@@ -305,9 +317,9 @@ services:
         max-file: "10"
     environment:
       POSTGRES_USER: "${POSTGRES_USER:-ignition}"
-      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-lab06-postgres-pw}"
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
       POSTGRES_DB: ignition_local_development
-      REPORTING_PASSWORD: "${REPORTING_PASSWORD:-lab06-reporting-pw}"
+      REPORTING_PASSWORD_FILE: /run/secrets/reporting_password
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ignition}"]
       interval: 5s

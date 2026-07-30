@@ -125,8 +125,7 @@ jobs:
       # Part 1C: add your "Materialize secret files" step HERE — it turns the
       # GitHub environment secrets into files under secrets/ (umask 177 +
       # printf '%s'). Without it the step below finds nothing and ships
-      # nothing, which is exactly the warm-up's broken state.
-            
+      # nothing, which is exactly the warm-up's broken state.      
       - name: Materialize secret files
         env:
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
